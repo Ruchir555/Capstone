@@ -32,3 +32,5 @@ On Windows:
 ###Authors
 
 Syed Haider Abidi, Nooruddin Ahmed and Christopher Dydula
+
+Anas Ali, Ruchir Tullu
