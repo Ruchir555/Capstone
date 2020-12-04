@@ -12,7 +12,6 @@ class JSONClass(QListWidget):
         self.initUI(getcwd())
 
     def initUI(self, path):
-        FileList = path
 
         self.tb = QTextBrowser()
         self.tb.setAcceptRichText(True)
@@ -24,7 +23,7 @@ class JSONClass(QListWidget):
         self.setWindowTitle('QTextBrowser')
         self.setGeometry(300, 300, 300, 300)
         self.show()
-        self.append_text(FileList)
+        self.append_text(path)
 
     def append_text(self, path):
         mypath = path
