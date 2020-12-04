@@ -25,7 +25,8 @@ from traxis import constants
 from traxis.gui import skeleton
 from traxis.calc import anglecalc, circlefit, optdensity
 from traxis.graphics import tangent
-from traxis.graphics import JSON3
+from traxis.graphics import JSON9
+import os
 
 
 class MainWidget(skeleton.GuiSkeleton):
@@ -75,6 +76,8 @@ class MainWidget(skeleton.GuiSkeleton):
         # connect other events
         self.dlLineEdit.textEdited.connect(self.dLEdited)
         self.markerList.itemSelectionChanged.connect(self.highlightPoint)
+
+        # self.JSONTextBrowser.itemSelectionChanged.connect(self.clickedJSON)
 
     ##############################
     # Keypress Event Handler
@@ -275,6 +278,9 @@ class MainWidget(skeleton.GuiSkeleton):
     def LoadFolder(self):
         dir_ = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\', QtWidgets.QFileDialog.ShowDirsOnly)
         self.JSONTextBrowser.append_text(dir_)
+
+    # def clickedJSON(self):
+    #     self.JSONTextBrowser.onClicked()
     ###############################################################################################
 
     def saveSession(self):

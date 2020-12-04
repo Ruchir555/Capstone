@@ -18,7 +18,7 @@
 import sys
 import os
 from PyQt5 import QtCore, QtGui, QtWidgets
-from traxis.graphics import markers, angleref, fittedarc, JSON3
+from traxis.graphics import markers, angleref, fittedarc, JSON9
 
 
 class GuiSkeleton(QtWidgets.QWidget):
@@ -205,6 +205,7 @@ class GuiSkeleton(QtWidgets.QWidget):
         self.LoadFolderbutton.setText("Load Folder")
         self.LoadFolderbutton.setToolTip(
             "Load a folder of tracks (JSON file format)")
+
 ###########################################################################
         # screenshot button widget
         self.screenshotButton = QtWidgets.QPushButton(self)
@@ -297,13 +298,12 @@ class GuiSkeleton(QtWidgets.QWidget):
         self.JSONLabel = QtWidgets.QLabel(self)  # JSON label
         self.JSONLayout.addWidget(self.JSONLabel)
         self.JSONLabel.setText("JSONLabel")
-        # self.markerList = markers.MarkerList(self)
 
         # JSON text browser widget
-        self.JSONTextBrowser = JSON3.JSONClass(self)
-        # self.JSONTextBrowser = QtWidgets.QTextBrowser(self)
-        # self.JSONTextBrowser = markers.MarkerList(self)                 #added
+        self.JSONTextBrowser = JSON9.Example(self)
         self.JSONLayout.addWidget(self.JSONTextBrowser)
+        # don't focus on this widget when clicked
+        # self.JSONTextBrowser.setFocusPolicy(QtCore.Qt.NoFocus)
         self.JSONTextBrowser.setMinimumWidth(100)
         ###########################################################################
 
