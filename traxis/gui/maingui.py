@@ -25,7 +25,7 @@ from traxis import constants
 from traxis.gui import skeleton
 from traxis.calc import anglecalc, circlefit, optdensity
 from traxis.graphics import tangent
-from traxis.graphics import JSON9
+from traxis.graphics import JSON11
 import os
 
 
@@ -55,8 +55,8 @@ class MainWidget(skeleton.GuiSkeleton):
         self.saveSessionButton.clicked.connect(self.saveSession)
         self.loadSessionButton.clicked.connect(self.loadSession)
         ####################################################################
-        self.saveOverSessionButton.clicked.connect(self.saveOverSessionfunc)
         self.LoadFolderbutton.clicked.connect(self.LoadFolder)
+        self.JSONTextBrowser.listWidget.itemDoubleClicked.connect(self.loadJSON)
         ####################################################################
         self.screenshotButton.clicked.connect(self.saveScreenshot)
         self.zoomInButton.clicked.connect(self.zoomIn)
@@ -76,8 +76,6 @@ class MainWidget(skeleton.GuiSkeleton):
         # connect other events
         self.dlLineEdit.textEdited.connect(self.dLEdited)
         self.markerList.itemSelectionChanged.connect(self.highlightPoint)
-
-        # self.JSONTextBrowser.itemSelectionChanged.connect(self.clickedJSON)
 
     ##############################
     # Keypress Event Handler
@@ -267,20 +265,81 @@ class MainWidget(skeleton.GuiSkeleton):
         return True
 
     ###############################################################################################
-    def saveOverSessionfunc(self):
-        """Save
-        """
-
-        alert = QMessageBox()
-        alert.setText('You clicked the button!')
-        alert.exec_()
-
     def LoadFolder(self):
         dir_ = QtWidgets.QFileDialog.getExistingDirectory(None, 'Select a folder:', 'C:\\', QtWidgets.QFileDialog.ShowDirsOnly)
         self.JSONTextBrowser.append_text(dir_)
 
-    # def clickedJSON(self):
-    #     self.JSONTextBrowser.onClicked()
+    def loadJSON(self, item):
+        # open file dialog for selecting a file to load from
+        fileName = self.JSONTextBrowser.cd + '\\' + item.text()
+
+        # return if no file was selected
+        if not fileName:
+            return
+
+        else:
+            # open the file contents
+            with open(fileName, 'r') as loadFile:
+                # try to load the file contents as a JSON formatted object
+                try:
+                    loadData = json.load(loadFile)
+                except:
+                    self.displayMessage("NOTICE: Invalid JSON file: {}".format(
+                                                                     fileName))
+                    return
+
+                # get the image filename from the saved session data
+                imageFileName = loadData.get('imageFileName')
+
+                # if the image filename is missing, return
+                if not imageFileName:
+                    self.displayMessage("NOTICE: No image file name found in saved session data: {}".format(fileName))
+                    return
+
+                # try to open the image. If it fails to open, return
+                opened = self.openImage(imageFileName)
+                if not opened:
+                    return
+
+                # get the track marker data from the saved session
+                points = loadData.get('points')
+                if points:
+                    # add each track marker to the marker list
+                    for point in points:
+                        pointDesignation = point["designation"]
+                        x = point['x']
+                        y = point['y']
+                        addedMarker = self.markerList.addMarker(
+                                          x, y, self.pointSize,
+                                          self.lineWidth, self.scene)
+                        # set the appropriate designation for each marker
+                        addedMarker.setDesignation(pointDesignation)
+
+                # get the dl data from the saved session
+                dl = loadData.get('dl')
+                # if it is a float, set it to the dl text box value
+                try:
+                    float(dl)
+                    self.dlLineEdit.setText(dl)
+                except (ValueError, TypeError):
+                    pass
+
+                # get the data for the initial and final points for the
+                # reference line
+                refInitialPoint = loadData.get('refInitialPoint')
+                refFinalPoint = loadData.get('refFinalPoint')
+                if refInitialPoint and refFinalPoint:
+                    # set the initial point, line and final point of the
+                    # reference line
+                    self.angleRefLine.setInitialPoint(
+                        refInitialPoint['x'], refInitialPoint['y'],
+                        self.pointSize, self.lineWidth, self.scene)
+                    self.angleRefLine.drawLine(
+                        refFinalPoint['x'], refFinalPoint['y'],
+                        self.lineWidth, self.scene)
+                    self.angleRefLine.setFinalPoint(
+                        refFinalPoint['x'], refFinalPoint['y'],
+                        self.pointSize, self.lineWidth, self.scene)
     ###############################################################################################
 
     def saveSession(self):
